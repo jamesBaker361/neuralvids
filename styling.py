@@ -9,6 +9,7 @@ output_path='./output/'
 style_path='./styles/'
 
 hub_module = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/1')
+framerate=25
 
 def tensor_to_image(tensor): #converts tensor to PIL Image, hub_module works on tensors
   tensor = tensor*255
@@ -18,7 +19,7 @@ def tensor_to_image(tensor): #converts tensor to PIL Image, hub_module works on 
     tensor = tensor[0]
   return Image.fromarray(tensor)
 
-def trans_imgs(scene,style_src,img_path=img_path,style_path=style_path,output_path=output_path,start=0,length=-1,hub_module=hub_module):
+def trans_imgs(scene,style_src,img_path=img_path,style_path=style_path,output_path=output_path,length=-1,hub_module=hub_module):
     '''
     given a scene, which represents a director @ img_path/scene, 
     and a style img @ style_path/style
@@ -28,9 +29,11 @@ def trans_imgs(scene,style_src,img_path=img_path,style_path=style_path,output_pa
         os.mkdir(output_path+scene)
     except:
         pass
-    start=max(start,0)
+    start=0
     if length<0:
         length=len(fnmatch.filter(os.listdir(img_path+scene), '*.png'))-start
+    else:
+        length=length*framerate
     style=load_img(style_src,img_path=style_path)
     for x in range(start,start+length):
         target=load_img(scene+'/{}.png'.format(x))
